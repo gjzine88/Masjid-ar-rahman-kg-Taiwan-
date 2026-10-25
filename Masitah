@@ -1,0 +1,14 @@
+}
+function selamat(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function eksport(){
+if(!data.length){alert('Belum ada rekod untuk dimuat turun.');return}
+let csv='Tarikh,Jenis,Perkara,Jumlah RM\n'+data.map(x=>[x.tarikh,x.jenis,'"'+x.perkara.replace(/"/g,'""')+'"',x.jumlah].join(',')).join('\n');
+let a=document.createElement('a');
+a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}));
+a.download='rekod-bendahari-masjid.csv';a.click();
+URL.revokeObjectURL(a.href);
+}
+papar();
+</script>
+</body>
+</html>
