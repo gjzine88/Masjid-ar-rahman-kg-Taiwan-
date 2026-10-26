@@ -1,1 +1,91 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bendahari Masjid Ar-Rahman</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f0f5f1;color:#20352a}
+header{background:#075b3b;color:white;text-align:center;padding:28px 15px}
+header h1{font-size:23px;margin:0 0 8px}
+header p{margin:0;font-size:14px}
+main{max-width:700px;margin:auto;padding:16px}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{background:white;padding:17px 12px;border-radius:12px;box-shadow:0 2px 8px #0001}
+.card small{color:#65756a}
+.card strong{display:block;font-size:20px;margin-top:8px;overflow-wrap:anywhere}
+.balance{grid-column:1/-1;background:#d9f4e3}
+section{background:white;padding:18px;margin-top:16px;border-radius:12px;box-shadow:0 2px 8px #0001}
+h2{font-size:18px;margin:0 0 16px}
+label{display:block;font-size:14px;margin:12px 0 6px}
+input,select,button{width:100%;padding:12px;border-radius:8px;border:1px solid #ccd7cf;font-size:16px}
+button{border:0;background:#087447;color:white;font-weight:bold;margin-top:14px;cursor:pointer}
+button.secondary{background:#e5eee8;color:#17452e}
+button.delete{width:auto;background:#ffe8e5;color:#9b2117;padding:8px;margin:0}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.item{padding:13px 0;border-bottom:1px solid #e6ece7}
+.item:last-child{border:0}
+.item p{margin:5px 0;color:#66736a;font-size:13px}
+.income{color:#087447;font-weight:bold}
+.expense{color:#b52e25;font-weight:bold}
+.empty{text-align:center;color:#718077;padding:20px 0}
+footer{text-align:center;padding:22px;color:#718077;font-size:12px}
+</style>
+</head>
+<body>
+<header>
+<div style="font-size:34px">🕌</div>
+<h1>BENDAHARI MASJID AR-RAHMAN</h1>
+<p>Kampung Taiwan · Rekod Kewangan Masjid</p>
+</header>
+<main>
+<div class="cards">
+<div class="card">
+<small>Jumlah Pendapatan</small>
+<strong id="income">RM0.00</strong>
+</div>
+<div class="card">
+<small>Jumlah Perbelanjaan</small>
+<strong id="expense">RM0.00</strong>
+</div>
+<div class="card balance">
+<small>BAKI KEWANGAN</small>
+<strong id="balance">RM0.00</strong>
+</div>
+</div>
 
+<section>
+<h2>📝 Rekod Transaksi Baharu</h2>
+<form id="form">
+<label for="type">Jenis transaksi</label>
+<select id="type" required>
+<option value="income">Pendapatan / Wang Masuk</option>
+<option value="expense">Perbelanjaan / Wang Keluar</option>
+</select>
+<label for="date">Tarikh</label>
+<input type="date" id="date" required>
+<label for="desc">Keterangan</label>
+<input id="desc" placeholder="Contoh: Derma Jumaat" required maxlength="150">
+<label for="amount">Jumlah (RM)</label>
+<input type="number" id="amount" placeholder="0.00" min="0.01" step="0.01" required>
+<label for="note">Catatan (pilihan)</label>
+<input id="note" placeholder="Contoh: Resit atau tujuan bayaran">
+<button type="submit">＋ Simpan Transaksi</button>
+</form>
+</section>
+
+<section>
+<div class="row">
+<h2 style="margin:0">📚 Rekod Kewangan</h2>
+</div>
+<label for="filter">Tapis rekod</label>
+<select id="filter">
+<option value="all">Semua transaksi</option>
+<option value="income">Pendapatan sahaja</option>
+<option value="expense">Perbelanjaan sahaja</option>
+</select>
+<div id="records"></div>
+<button class="secondary" id="export">⬇ Muat Turun Rekod CSV</button>
+<button class="secondary" id="backup">Simpan Salinan Data (JSON)</button>
+<p style="font-size:12px;color:#718077">Penting: Rekod disimpan dalam pelayar pada peranti ini. Muat turun salinan data
