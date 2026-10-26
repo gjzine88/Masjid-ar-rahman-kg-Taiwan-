@@ -1,91 +1,119 @@
-<!DOCTYPE html>
-<html lang="ms">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bendahari Masjid Ar-Rahman</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f0f5f1;color:#20352a}
-header{background:#075b3b;color:white;text-align:center;padding:28px 15px}
-header h1{font-size:23px;margin:0 0 8px}
-header p{margin:0;font-size:14px}
-main{max-width:700px;margin:auto;padding:16px}
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.card{background:white;padding:17px 12px;border-radius:12px;box-shadow:0 2px 8px #0001}
-.card small{color:#65756a}
-.card strong{display:block;font-size:20px;margin-top:8px;overflow-wrap:anywhere}
-.balance{grid-column:1/-1;background:#d9f4e3}
-section{background:white;padding:18px;margin-top:16px;border-radius:12px;box-shadow:0 2px 8px #0001}
-h2{font-size:18px;margin:0 0 16px}
-label{display:block;font-size:14px;margin:12px 0 6px}
-input,select,button{width:100%;padding:12px;border-radius:8px;border:1px solid #ccd7cf;font-size:16px}
-button{border:0;background:#087447;color:white;font-weight:bold;margin-top:14px;cursor:pointer}
-button.secondary{background:#e5eee8;color:#17452e}
-button.delete{width:auto;background:#ffe8e5;color:#9b2117;padding:8px;margin:0}
-.row{display:flex;justify-content:space-between;gap:10px;align-items:center}
-.item{padding:13px 0;border-bottom:1px solid #e6ece7}
-.item:last-child{border:0}
-.item p{margin:5px 0;color:#66736a;font-size:13px}
-.income{color:#087447;font-weight:bold}
-.expense{color:#b52e25;font-weight:bold}
-.empty{text-align:center;color:#718077;padding:20px 0}
-footer{text-align:center;padding:22px;color:#718077;font-size:12px}
-</style>
-</head>
-<body>
-<header>
-<div style="font-size:34px">🕌</div>
-<h1>BENDAHARI MASJID AR-RAHMAN</h1>
-<p>Kampung Taiwan · Rekod Kewangan Masjid</p>
-</header>
-<main>
-<div class="cards">
-<div class="card">
-<small>Jumlah Pendapatan</small>
-<strong id="income">RM0.00</strong>
-</div>
-<div class="card">
-<small>Jumlah Perbelanjaan</small>
-<strong id="expense">RM0.00</strong>
-</div>
-<div class="card balance">
-<small>BAKI KEWANGAN</small>
-<strong id="balance">RM0.00</strong>
-</div>
-</div>
+const shown=records.filter(r=>
+el('filter').value==='all'||r.type===el('filter').value
+);
 
-<section>
-<h2>📝 Rekod Transaksi Baharu</h2>
-<form id="form">
-<label for="type">Jenis transaksi</label>
-<select id="type" required>
-<option value="income">Pendapatan / Wang Masuk</option>
-<option value="expense">Perbelanjaan / Wang Keluar</option>
-</select>
-<label for="date">Tarikh</label>
-<input type="date" id="date" required>
-<label for="desc">Keterangan</label>
-<input id="desc" placeholder="Contoh: Derma Jumaat" required maxlength="150">
-<label for="amount">Jumlah (RM)</label>
-<input type="number" id="amount" placeholder="0.00" min="0.01" step="0.01" required>
-<label for="note">Catatan (pilihan)</label>
-<input id="note" placeholder="Contoh: Resit atau tujuan bayaran">
-<button type="submit">＋ Simpan Transaksi</button>
-</form>
-</section>
+if(shown.length===0){
+const p=document.createElement('p');
+p.textContent='Belum ada rekod transaksi.';
+box.appendChild(p);
+return;
+}
 
-<section>
-<div class="row">
-<h2 style="margin:0">📚 Rekod Kewangan</h2>
-</div>
-<label for="filter">Tapis rekod</label>
-<select id="filter">
-<option value="all">Semua transaksi</option>
-<option value="income">Pendapatan sahaja</option>
-<option value="expense">Perbelanjaan sahaja</option>
-</select>
-<div id="records"></div>
-<button class="secondary" id="export">⬇ Muat Turun Rekod CSV</button>
-<button class="secondary" id="backup">Simpan Salinan Data (JSON)</button>
-<p style="font-size:12px;color:#718077">Penting: Rekod disimpan dalam pelayar pada peranti ini. Muat turun salinan data
+shown.slice().reverse().forEach(r=>{
+const item=document.createElement('div');
+item.className='item';
+
+const row=document.createElement('div');
+row.className='row';
+
+const info=document.createElement('div');
+const title=document.createElement('strong');
+title.textContent=r.desc;
+
+const detail=document.createElement('small');
+detail.textContent=r.date+(r.note?' · '+r.note:'');
+
+const amount=document.createElement('span');
+amount.className=r.type==='income'?'income':'expense';
+amount.textContent=(r.type==='income'?'+':'−')+money(r.amount);
+
+info.append(title,detail);
+row.append(info,amount);
+
+const del=document.createElement('button');
+del.type='button';
+del.className='delete';
+del.textContent='Padam';
+del.onclick=function(){
+if(confirm('Padam rekod ini?')){
+records=records.filter(x=>x.id!==r.id);
+save();
+render();
+el('status').textContent='Rekod dipadam.';
+}
+};
+
+item.append(row,del);
+box.appendChild(item);
+});
+}
+
+el('form').addEventListener('submit',function(e){
+e.preventDefault();
+
+const amount=Number(el('amount').value);
+const desc=el('desc').value.trim();
+
+if(!desc||!Number.isFinite(amount)||amount<=0){
+el('status').textContent='Sila masukkan keterangan dan jumlah yang sah.';
+return;
+}
+
+records.push({
+id:Date.now().toString()+Math.random().toString(16).slice(2),
+type:el('type').value,
+date:el('date').value,
+desc:desc,
+amount:Math.round(amount*100)/100,
+note:el('note').value.trim()
+});
+
+save();
+render();
+
+el('desc').value='';
+el('amount').value='';
+el('note').value='';
+
+el('status').textContent=storageOK
+?'Transaksi berjaya disimpan dan rekod dikemas kini.'
+:'Transaksi dikemas kini untuk sesi ini, tetapi pelayar tidak membenarkan simpanan kekal. Muat turun sandaran sebelum menutup halaman.';
+});
+
+el('filter').addEventListener('change',render);
+
+function download(data,name,type){
+const blob=new Blob([data],{type:type});
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=url;
+a.download=name;
+a.click();
+setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+
+el('csv').onclick=function(){
+const rows=[['Tarikh','Jenis','Keterangan','Jumlah RM','Catatan']];
+records.forEach(r=>rows.push([
+r.date,
+r.type==='income'?'Pendapatan':'Perbelanjaan',
+r.desc,
+Number(r.amount).toFixed(2),
+r.note||''
+]));
+const csv=rows.map(row=>row.map(v=>
+'"'+String(v).replace(/"/g,'""')+'"'
+).join(',')).join('\r\n');
+download('\uFEFF'+csv,'rekod-masjid.csv','text/csv;charset=utf-8');
+};
+
+el('backup').onclick=function(){
+download(JSON.stringify(records,null,2),
+'sandaran-masjid-ar-rahman.json','application/json');
+};
+
+render();
+})();
+</script>
+</body>
+</html>
